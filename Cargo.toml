@@ -1,0 +1,12 @@
+[package]
+name = "rhttpfile"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+base64 = "0.22.1"
+clap = { version = "4.5.20", features = ["derive"] }
+rand = "0.8.5"
+rcgen = "0.13.1"
+rocket = { version = "0.5.1", features = ["tls"] }
+time = "0.3.36"
