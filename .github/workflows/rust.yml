@@ -62,10 +62,16 @@ jobs:
           cache-all-crates: true
       - name: Build
         run: cargo build --release --locked
-      - name: Get version
+      - name: Get version from Cargo.toml (osx/linux)
+        if: runner.os != 'Windows'
         run: |
           version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
           echo "version=$version" >> $GITHUB_ENV
+      - name: Get version from Cargo.toml (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $version = (cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          echo "version=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
