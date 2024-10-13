@@ -138,3 +138,91 @@ fn generate_certs() -> core::result::Result<TlsConfig, io::Error> {
         certs_dir.join("key.pem"),
     ))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rocket::http::Status;
+    use rocket::{http::ContentType, local::asynchronous::Client};
+
+    // Launch the rocket instance for testing
+    fn rocket() -> rocket::Rocket<rocket::Build> {
+        rocket::build().mount("/", routes![upload, index, retrieve])
+    }
+
+    #[rocket::async_test]
+    async fn hello_world() {
+        let client = Client::tracked(rocket())
+            .await
+            .expect("valid rocket instance");
+        let response = client.get(uri!(super::index)).dispatch().await;
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().await.unwrap().contains("USAGE"));
+    }
+
+    async fn file_upload(file_name: &str) -> String {
+        let client = Client::tracked(rocket())
+            .await
+            .expect("valid rocket instance");
+        let form_data = format!(
+            "--boundary\r\n\
+             Content-Disposition: form-data; name=\"file\"; filename=\"{file_name}\"\r\n\
+             Content-Type: text/plain\r\n\r\n
+             This is a test file.\r\n\
+             --boundary--\r\n"
+        );
+        let response = client
+            .post("/")
+            .header(
+                ContentType::new("multipart", "form-data").with_params(("boundary", "boundary")),
+            )
+            .body(form_data)
+            .dispatch()
+            .await;
+        let body = response.into_string().await.unwrap();
+        body
+    }
+    #[rocket::async_test]
+    async fn test_file_upload() {
+        let body = file_upload("test_file.txt").await;
+        assert!(body.contains("/dGVzdF9maWxlLnR4dA")); //base64 of test_file.txt
+    }
+
+    #[rocket::async_test]
+    async fn test_file_download() {
+        let link = file_upload("test_file.txt").await;
+        let client = Client::tracked(rocket())
+            .await
+            .expect("valid rocket instance");
+        let response = client.get(link).dispatch().await;
+        assert_eq!(response.status(), Status::Ok);
+        let body = response.into_string().await.unwrap();
+        assert!(body.contains("This is a test file."));
+    }
+
+    #[rocket::async_test]
+    async fn test_path_traversal() {
+        let link = file_upload("../../../../../../../../../../../etc/passwd").await;
+        let client = Client::tracked(rocket())
+            .await
+            .expect("valid rocket instance");
+        let response = client.get(link).dispatch().await;
+        assert_eq!(response.status(), Status::Ok);
+        let body = response.into_string().await.unwrap();
+        assert!(body.contains("This is a test file."));
+    }
+
+    #[rocket::async_test]
+    async fn test_long_filename() {
+        let long_file_name = (0..100000)
+            .map(|n| n.to_string())
+            .collect::<Vec<String>>()
+            .join(", ");
+        let link = file_upload(&long_file_name).await;
+        let client = Client::tracked(rocket())
+            .await
+            .expect("valid rocket instance");
+        let response = client.get(link).dispatch().await;
+        assert_eq!(response.status(), Status::BadRequest);
+    }
+}
