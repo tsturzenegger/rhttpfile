@@ -213,6 +213,18 @@ mod tests {
     }
 
     #[rocket::async_test]
+    async fn test_special_chars() {
+        let link = file_upload("a/\\b/some/.*file<.txt.zip").await;
+        let client = Client::tracked(rocket())
+            .await
+            .expect("valid rocket instance");
+        let response = client.get(link).dispatch().await;
+        assert_eq!(response.status(), Status::Ok);
+        let body = response.into_string().await.unwrap();
+        assert!(body.contains("This is a test file."));
+    }
+
+    #[rocket::async_test]
     async fn test_long_filename() {
         let long_file_name = (0..100000)
             .map(|n| n.to_string())
