@@ -41,19 +41,19 @@ struct Cli {
     upload_limit: usize,
 
     /// directory with the tls certificates e.g. certs
-    #[arg(short, long, default_value = "certs")]
+    #[arg(long, default_value = "certs")]
     certs_dir: String,
 
     /// file name of key e.g. key.pem
-    #[arg(short, long, default_value = "key.pem")]
+    #[arg(long, default_value = "key.pem")]
     key_file_name: String,
 
     /// file name of cert e.g. cert.pem
-    #[arg(short, long, default_value = "cert.pem")]
+    #[arg(long, default_value = "cert.pem")]
     cert_file_name: String,
 
     /// self signed cert subject alt name e.g. localhost
-    #[arg(short, long, default_value = "localhost")]
+    #[arg(long, default_value = "localhost")]
     subject_alt_name: String,
 }
 

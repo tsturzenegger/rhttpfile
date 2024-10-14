@@ -22,15 +22,27 @@ Download prebuilt package from releases.
 ./rhttpfile --help
 Simple http server to upload and download files
 
-Usage: rhttpfile [OPTIONS] [ADDR]
+Usage: rhttpfile [OPTIONS] [ADDR] [PORT]
 
 Arguments:
   [ADDR]  ip_addr e.g. 127.0.0.1 [default: 127.0.0.1]
+  [PORT]  port e.g. 8080 [default: 8080]
 
 Options:
-  -p, --port <PORT>  ip_addr e.g. 8080 [default: 8080]
-  -h, --help         Print help
-  -V, --version      Print version
+  -u, --upload-limit <UPLOAD_LIMIT>
+          upload limit (mebibytes) e.g. 1000 [default: 1000]
+      --certs-dir <CERTS_DIR>
+          directory with the tls certificates e.g. certs [default: certs]
+      --key-file-name <KEY_FILE_NAME>
+          file name of key e.g. key.pem [default: key.pem]
+      --cert-file-name <CERT_FILE_NAME>
+          file name of cert e.g. cert.pem [default: cert.pem]
+      --subject-alt-name <SUBJECT_ALT_NAME>
+          self signed cert subject alt name e.g. localhost [default: localhost]
+  -h, --help
+          Print help
+  -V, --version
+          Print version
 
 ```
 
