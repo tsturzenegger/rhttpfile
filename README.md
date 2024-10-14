@@ -25,17 +25,17 @@ Simple http server to upload and download files
 Usage: rhttpfile [OPTIONS] [ADDR] [PORT]
 
 Arguments:
-  [ADDR]  ip address [default: 127.0.0.1]
-  [PORT]  port [default: 8080]
+  [ADDR]  Ip address [default: 127.0.0.1]
+  [PORT]  Port [default: 8080]
 
 Options:
-  -u, --upload-limit <UPLOAD_LIMIT>          upload limit (mebibytes) [default: 1000]
-      --certs-dir <CERTS_DIR>                directory with the tls certificates [default: certs]
-      --key-file-name <KEY_FILE_NAME>        file name of key [default: key.pem]
-      --cert-file-name <CERT_FILE_NAME>      file name of cert [default: cert.pem]
-      --subject-alt-name <SUBJECT_ALT_NAME>  self signed cert subject alt name [default: localhost]
+  -u, --upload-limit <UPLOAD_LIMIT>          Upload limit (mebibytes) [default: 1000]
+      --certs-dir <CERTS_DIR>                Directory with the tls certificates [default: certs]
+      --key-file-name <KEY_FILE_NAME>        File name of key [default: key.pem]
+      --cert-file-name <CERT_FILE_NAME>      File name of cert [default: cert.pem]
+      --subject-alt-name <SUBJECT_ALT_NAME>  Self signed cert subject alt name [default: localhost]
   -h, --help                                 Print help
-  -V, --version                              Print version
+  -V, --version                                Print version
 
 ```
 
