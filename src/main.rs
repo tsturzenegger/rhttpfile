@@ -258,4 +258,10 @@ mod tests {
         let response = client.get(link).dispatch().await;
         assert_eq!(response.status(), Status::BadRequest);
     }
+
+    #[test]
+    fn test_cli() {
+        let cli = Cli::parse();
+        assert_eq!(cli.port, 8080);
+    }
 }
