@@ -32,9 +32,29 @@ struct Cli {
     #[arg(default_value = "127.0.0.1")]
     addr: String,
 
-    /// ip_addr e.g. 8080
-    #[arg(short, long, default_value_t = 8080)]
+    /// port e.g. 8080
+    #[arg(default_value_t = 8080)]
     port: u16,
+
+    /// upload limit (mebibytes) e.g. 1000
+    #[arg(short, long, default_value_t = 1000)]
+    upload_limit: usize,
+
+    /// directory with the tls certificates e.g. certs
+    #[arg(short, long, default_value = "certs")]
+    certs_dir: String,
+
+    /// file name of key e.g. key.pem
+    #[arg(short, long, default_value = "key.pem")]
+    key_file_name: String,
+
+    /// file name of cert e.g. cert.pem
+    #[arg(short, long, default_value = "cert.pem")]
+    cert_file_name: String,
+
+    /// self signed cert subject alt name e.g. localhost
+    #[arg(short, long, default_value = "localhost")]
+    subject_alt_name: String,
 }
 
 #[derive(FromForm)]
@@ -107,12 +127,12 @@ fn index() -> RawHtml<&'static str> {
 #[launch]
 fn rocket() -> _ {
     let cli = Cli::parse();
-    let tls_config = generate_certs().expect("could not generate or load certs");
+    let tls_config = generate_certs(&cli).expect("could not generate or load certs");
     let config = Config {
         tls: Some(tls_config),
         limits: Limits::new()
-            .limit("file", 1.gibibytes())
-            .limit("data-form", 1.gibibytes()),
+            .limit("file", cli.upload_limit.mebibytes())
+            .limit("data-form", cli.upload_limit.mebibytes()),
         address: IpAddr::from_str(&cli.addr).expect("Invalid IP adress"),
         port: cli.port,
         ..Default::default()
@@ -121,21 +141,22 @@ fn rocket() -> _ {
 }
 
 /// Generates TLS Cert if they are not present in ./certs folder.
-fn generate_certs() -> core::result::Result<TlsConfig, io::Error> {
+fn generate_certs(cli: &Cli) -> core::result::Result<TlsConfig, io::Error> {
     let mut current_exe = env::current_exe()?;
     current_exe.pop();
-    let certs_dir = current_exe.join("certs");
-    if !certs_dir.join("key.pem").exists() || !certs_dir.join("cert.pem").exists() {
+    let certs_dir = current_exe.join(&cli.certs_dir);
+    if !certs_dir.join(&cli.key_file_name).exists() || !certs_dir.join(&cli.cert_file_name).exists()
+    {
         let CertifiedKey { cert, key_pair } =
-            generate_simple_self_signed(vec!["localhost".to_string()])
+            generate_simple_self_signed(vec![cli.subject_alt_name.clone()])
                 .expect("Could not generate self signed cert.");
         fs::create_dir_all(&certs_dir).expect("could not create upload dir.");
-        fs::write(certs_dir.join("key.pem"), key_pair.serialize_pem())?;
-        fs::write(certs_dir.join("cert.pem"), cert.pem())?;
+        fs::write(certs_dir.join(&cli.key_file_name), key_pair.serialize_pem())?;
+        fs::write(certs_dir.join(&cli.cert_file_name), cert.pem())?;
     }
     Ok(TlsConfig::from_paths(
-        certs_dir.join("cert.pem"),
-        certs_dir.join("key.pem"),
+        certs_dir.join(&cli.cert_file_name),
+        certs_dir.join(&cli.key_file_name),
     ))
 }
 
