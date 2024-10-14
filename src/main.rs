@@ -28,31 +28,31 @@ const ID_LENGTH: usize = 32;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// ip_addr e.g. 127.0.0.1
+    /// ip address
     #[arg(default_value = "127.0.0.1")]
     addr: String,
 
-    /// port e.g. 8080
+    /// port
     #[arg(default_value_t = 8080)]
     port: u16,
 
-    /// upload limit (mebibytes) e.g. 1000
+    /// upload limit (mebibytes)
     #[arg(short, long, default_value_t = 1000)]
     upload_limit: usize,
 
-    /// directory with the tls certificates e.g. certs
+    /// directory with the tls certificates
     #[arg(long, default_value = "certs")]
     certs_dir: String,
 
-    /// file name of key e.g. key.pem
+    /// file name of key
     #[arg(long, default_value = "key.pem")]
     key_file_name: String,
 
-    /// file name of cert e.g. cert.pem
+    /// file name of cert
     #[arg(long, default_value = "cert.pem")]
     cert_file_name: String,
 
-    /// self signed cert subject alt name e.g. localhost
+    /// self signed cert subject alt name
     #[arg(long, default_value = "localhost")]
     subject_alt_name: String,
 }
