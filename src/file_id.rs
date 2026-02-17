@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::{env, fs};
 
 use base64::{engine::general_purpose::URL_SAFE, Engine as _};
-use rand::{self, Rng};
+use rand::{self, RngExt};
 use rocket::request::FromParam;
 
 /// A _probably_ unique file ID.
