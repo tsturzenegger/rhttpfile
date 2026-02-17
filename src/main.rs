@@ -147,11 +147,11 @@ fn generate_certs(cli: &Cli) -> core::result::Result<TlsConfig, io::Error> {
     let certs_dir = current_exe.join(&cli.certs_dir);
     if !certs_dir.join(&cli.key_file_name).exists() || !certs_dir.join(&cli.cert_file_name).exists()
     {
-        let CertifiedKey { cert, key_pair } =
+        let CertifiedKey { cert, signing_key } =
             generate_simple_self_signed(vec![cli.subject_alt_name.clone()])
                 .expect("Could not generate self signed cert.");
         fs::create_dir_all(&certs_dir).expect("could not create upload dir.");
-        fs::write(certs_dir.join(&cli.key_file_name), key_pair.serialize_pem())?;
+        fs::write(certs_dir.join(&cli.key_file_name), signing_key.serialize_pem())?;
         fs::write(certs_dir.join(&cli.cert_file_name), cert.pem())?;
     }
     Ok(TlsConfig::from_paths(
